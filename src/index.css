@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  --color-murdle-app-bg: #09090b; 
+  --color-murdle-dossier: #18181b; 
+  --color-murdle-grid-bg: #27272a; 
+  --color-murdle-grid-header: #3f3f46; 
+  --color-murdle-grid-border: #52525b; 
+  --color-murdle-grid-thick: #a1a1aa; 
+  --color-murdle-text: #e4e4e7; 
+  --color-murdle-text-muted: #a1a1aa; 
+  
+  --color-murdle-accent: #ef4444; 
+  --color-murdle-success: #10b981; 
+  
+  --font-mono: "Courier Prime", "Courier New", Courier, monospace;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-murdle-app-bg);
+    color: var(--color-murdle-text);
+    touch-action: manipulation;
+    font-family: var(--font-mono);
+  }
+}
+
+/* Custom class if needed */
+.app-bg {
+  background-color: var(--color-murdle-app-bg);
+}
