@@ -104,7 +104,7 @@ export const LogicGrid: React.FC = () => {
                     <th className={`
                       h-8 sm:h-10 px-2 py-1 border border-[var(--color-murdle-grid-border)] 
                       bg-[var(--color-murdle-grid-header)] text-right text-[10px] sm:text-xs 
-                      text-[var(--color-murdle-text-muted)] font-normal whitespace-nowrap
+                      text-[var(--color-murdle-text-muted)] font-bold whitespace-nowrap
                       border-r-2 border-r-[var(--color-murdle-grid-thick)]
                       ${isLastRow ? 'border-b-2 border-b-[var(--color-murdle-grid-thick)]' : ''}
                     `}>

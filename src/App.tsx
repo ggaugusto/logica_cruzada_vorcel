@@ -1,13 +1,74 @@
 import { Header } from './components/Header';
 import { LogicGrid } from './components/LogicGrid';
 import { CategoryEditor } from './components/CategoryEditor';
+import { VictoryModal } from './components/VictoryModal';
 import { useTranslation } from 'react-i18next';
-import { useGridStore } from './store/useGridStore';
+import { useGridStore, Category, MarkType, GridItem } from './store/useGridStore';
+import { useEffect, useState } from 'react';
+
+const getVictoryCombinations = (categories: Category[], marks: Record<string, MarkType>): GridItem[][] | null => {
+  if (categories.length < 2) return null;
+  const N = categories.length;
+  const C0 = categories[0];
+  const M = C0.items.length;
+  if (M === 0) return null;
+
+  const validCombinations: GridItem[][] = [];
+
+  for (let i = 0; i < M; i++) {
+    const item0 = C0.items[i];
+    const combo = [item0];
+
+    let failed = false;
+    for (let c = 1; c < N; c++) {
+      const cat = categories[c];
+      const checkedItems = cat.items.filter(item => marks[`${item0.id}::${item.id}`] === 'check');
+      if (checkedItems.length !== 1) {
+        failed = true;
+        break;
+      }
+      combo.push(checkedItems[0]);
+    }
+    if (failed) return null;
+
+    for (let a = 0; a < N; a++) {
+      for (let b = a + 1; b < N; b++) {
+        if (marks[`${combo[a].id}::${combo[b].id}`] !== 'check') {
+          return null; // Inconsistent
+        }
+      }
+    }
+
+    validCombinations.push(combo);
+  }
+
+  for (let c = 1; c < N; c++) {
+    const usedIds = new Set(validCombinations.map(combo => combo[c].id));
+    if (usedIds.size !== M) return null; // Used items must be unique per category block
+  }
+
+  return validCombinations;
+};
 
 function App() {
   const { t } = useTranslation();
   const caseName = useGridStore(state => state.caseName);
   const setCaseName = useGridStore(state => state.setCaseName);
+  const marks = useGridStore(state => state.marks);
+  const categories = useGridStore(state => state.categories);
+  
+  const [victoryData, setVictoryData] = useState<GridItem[][] | null>(null);
+  const [hasShownVictory, setHasShownVictory] = useState(false);
+
+  useEffect(() => {
+    const combos = getVictoryCombinations(categories, marks);
+    if (combos && !hasShownVictory) {
+      setVictoryData(combos);
+      setHasShownVictory(true);
+    } else if (!combos) {
+      setHasShownVictory(false);
+    }
+  }, [marks, categories, hasShownVictory]);
 
   return (
     <div className="min-h-screen app-bg text-[var(--color-murdle-text)] font-mono flex flex-col relative selection:bg-red-900/50">
@@ -50,6 +111,9 @@ function App() {
       </main>
 
       <CategoryEditor />
+      {victoryData && (
+        <VictoryModal data={victoryData} onClose={() => setVictoryData(null)} />
+      )}
     </div>
   );
 }
